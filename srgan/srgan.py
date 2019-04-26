@@ -16,8 +16,8 @@ from keras.datasets import mnist
 # from keras_contrib.layers.normalization.instancenormalization import InstanceNormalization
 from keras.layers import Input, Dense, Reshape, Flatten, Dropout, Concatenate
 from keras.layers import BatchNormalization, Activation, ZeroPadding2D, Add
-from keras.layers.advanced_activations import PReLU, LeakyReLU
-from keras.layers.convolutional import UpSampling2D, Conv2D
+from keras.layers.advanced_activations import PReLU, LeakyReLU, ReLU
+from keras.layers.convolutional import UpSampling2D, Conv2D, Conv2DTranspose
 from keras.applications import VGG19
 from keras.models import Sequential, Model, load_model
 from keras.optimizers import Adam
@@ -117,54 +117,42 @@ class SRGAN():
 
     def build_generator(self):
 
-        def residual_block(layer_input, filters):
-            """Residual block described in paper"""
-            d = Conv2D(filters, kernel_size=3, strides=1, padding='same')(layer_input)
-            d = Activation('relu')(d)
+        def conv2d(c):
+            d = Conv2D(64, kernel_size=5, strides=1, padding='same')(c)
+            d = ReLU(alpha=0.2)(d)
             d = BatchNormalization(momentum=0.8)(d)
-            d = Conv2D(filters, kernel_size=3, strides=1, padding='same')(d)
-            d = BatchNormalization(momentum=0.8)(d)
-            d = Add()([d, layer_input])
             return d
 
         def deconv2d(layer_input):
             """Layers used during upsampling"""
-            u = UpSampling2D(size=2)(layer_input)
-            u = Conv2D(256, kernel_size=3, strides=1, padding='same')(u)
+            u = Conv2DTranspose(64, kernel_size=6, strides=2, padding='same')(layer_input)
             u = Activation('relu')(u)
+            u = BatchNormalization(momentum=0.8)(u)
             return u
 
         # Low resolution image input
         img_lr = Input(shape=self.lr_shape)
 
-        # Pre-residual block
-        c1 = Conv2D(64, kernel_size=9, strides=1, padding='same')(img_lr)
-        c1 = Activation('relu')(c1)
-
-        # Propogate through residual blocks
-        r = residual_block(c1, self.gf)
-        for _ in range(self.n_residual_blocks - 1):
-            r = residual_block(r, self.gf)
-
-        # Post-residual block
-        c2 = Conv2D(64, kernel_size=3, strides=1, padding='same')(r)
-        c2 = BatchNormalization(momentum=0.8)(c2)
-        c2 = Add()([c2, c1])
-
-        # Upsampling
-        u1 = deconv2d(c2)
-        u2 = deconv2d(u1)
-
-        # Generate high resolution output
-        gen_hr = Conv2D(self.channels, kernel_size=9, strides=1, padding='same', activation='tanh')(u2)
+        u1 = deconv2d(img_lr)
+        c1 = conv2d(u1)
+        u2 = deconv2d(c1)
+        c2 = conv2d(u2)
+        c3 = conv2d(c2)
+        c4 = conv2d(c3)
+        c5 = conv2d(c4)
+        c6 = conv2d(c5)
+        c7 = conv2d(c6)
+        c8 = conv2d(c7)
+        c9 = conv2d(c8)
+        gen_hr = Conv2D(self.channels, kernel_size=5, strides=1, padding='same', activation='tanh')(c9)
 
         return Model(img_lr, gen_hr)
 
     def build_discriminator(self):
 
-        def d_block(layer_input, filters, strides=1, bn=True):
+        def d_block(layer_input, filters=64, strides=2, bn=True):
             """Discriminator layer"""
-            d = Conv2D(filters, kernel_size=3, strides=strides, padding='same')(layer_input)
+            d = Conv2D(filters, kernel_size=4, strides=strides, padding='same')(layer_input)
             d = LeakyReLU(alpha=0.2)(d)
             if bn:
                 d = BatchNormalization(momentum=0.8)(d)
@@ -173,18 +161,12 @@ class SRGAN():
         # Input img
         d0 = Input(shape=self.hr_shape)
 
-        d1 = d_block(d0, self.df, bn=False)
-        d2 = d_block(d1, self.df, strides=2)
-        d3 = d_block(d2, self.df*2)
-        d4 = d_block(d3, self.df*2, strides=2)
-        d5 = d_block(d4, self.df*4)
-        d6 = d_block(d5, self.df*4, strides=2)
-        d7 = d_block(d6, self.df*8)
-        d8 = d_block(d7, self.df*8, strides=2)
+        d1 = d_block(d0, bn=False)
+        d2 = d_block(d1)
+        d3 = d_block(d2)
+        d4 = d_block(d3)
 
-        d9 = Dense(self.df*16)(d8)
-        d10 = LeakyReLU(alpha=0.2)(d9)
-        validity = Dense(1, activation='sigmoid')(d10)
+        validity = Dense(1, activation='sigmoid')(d4)
 
         return Model(d0, validity)
 
