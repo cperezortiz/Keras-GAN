@@ -273,7 +273,7 @@ def get_ssim(y_true, y_pred):
 
 def evaluate():
     data_loader = DataLoader('', img_res=(256,256))
-    imgs_hr, imgs_lr = data_loader.load_data(batch_size=10, is_testing=True)
+    imgs_hr, imgs_lr = data_loader.load_data(batch_size=100, is_testing=True)
     
     filepath = './{}'.format('blurry_GD.h5')
     model = load_model(filepath)
