@@ -56,7 +56,7 @@ class SRGAN():
             metrics=['accuracy'])
 
         # Configure data loader
-        self.dataset_name = 'blurry_GD'
+        self.dataset_name = 'blurry_cost'
         self.data_loader = DataLoader(dataset_name=self.dataset_name,
                                       img_res=(self.hr_height, self.hr_width))
 
@@ -214,10 +214,10 @@ class SRGAN():
             print ("%d time: %s" % (epoch, elapsed_time))
 
             # If at save interval => save generated image samples
-            # if epoch % sample_interval == 0:
-            #     self.sample_images(epoch)
-            #     self.generator.save('blurry_GD.h5')
-        self.generator.save('blurry_GD.h5')
+            if epoch % sample_interval == 0:
+                self.sample_images(epoch)
+                
+        self.generator.save('blurry_cost.h5')
 
     def sample_images(self, epoch):
         os.makedirs('images/%s' % self.dataset_name, exist_ok=True)
@@ -269,7 +269,7 @@ def evaluate():
     data_loader = DataLoader('', img_res=(256,256))
     imgs_hr, imgs_lr = data_loader.load_data(batch_size=10, is_testing=True)
     
-    filepath = './{}'.format('blurry_GD.h5')
+    filepath = './{}'.format('blurry_cost.h5')
     model = load_model(filepath)
     fakes_hr = model.predict(imgs_lr)
 
