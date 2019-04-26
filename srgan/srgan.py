@@ -278,18 +278,11 @@ def get_psnr(y_true, y_pred):
     return -10. * np.log10(np.mean(np.square(y_pred - y_true)))
 
 def get_ssim(y_true, y_pred):
-    print('shape: ', y_true.shape)
-    print('len: ', len(y_true))
 
     ssim_mean = 0.0
     for i in range(len(y_true)):
-        ssim_mean += ssim(y_true[i], y_pred[i], multichannel=True)
-        print(ssim_mean)
-
+        ssim_mean += ssim(y_true[i], y_pred[i], multichannel=True, data_range=2.0)
     return ssim_mean/len(y_true)
-    # for 
-    # ssim_val = ssim(img, img_const, dynamic_range=img_noise.max() - img_noise.min())
-    # return ssim_val
 
 def evaluate():
     data_loader = DataLoader('', img_res=(256,256))
