@@ -19,7 +19,7 @@ from keras.layers import BatchNormalization, Activation, ZeroPadding2D, Add
 from keras.layers.advanced_activations import PReLU, LeakyReLU
 from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.applications import VGG19
-from keras.models import Sequential, Model
+from keras.models import Sequential, Model, load_model
 from keras.optimizers import Adam
 import datetime
 import matplotlib.pyplot as plt
@@ -235,6 +235,8 @@ class SRGAN():
             # If at save interval => save generated image samples
             if epoch % sample_interval == 0:
                 self.sample_images(epoch)
+                self.combined.save('srgan_plain.h5')
+                # self.combined.load_model('srgan_plain.h5')
 
     def sample_images(self, epoch):
         os.makedirs('images/%s' % self.dataset_name, exist_ok=True)
