@@ -252,4 +252,4 @@ class SRGAN():
 
 if __name__ == '__main__':
     gan = SRGAN()
-    gan.train(epochs=3000, batch_size=1, sample_interval=50)
+    gan.train(epochs=6000, batch_size=1, sample_interval=50)
