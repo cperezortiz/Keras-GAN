@@ -55,7 +55,7 @@ class SRGAN():
             metrics=['accuracy'])
 
         # Configure data loader
-        self.dataset_name = 'blurry_64'
+        self.dataset_name = 'blurry_GD'
         self.data_loader = DataLoader(dataset_name=self.dataset_name,
                                       img_res=(self.hr_height, self.hr_width))
 
@@ -217,7 +217,7 @@ class SRGAN():
             # If at save interval => save generated image samples
             if epoch % sample_interval == 0:
                 self.sample_images(epoch)
-                self.combined.save('blurry_64.h5')
+                self.combined.save('blurry_GD.h5')
                 # self.combined.load_model('srgan_plain.h5')
 
     def sample_images(self, epoch):
