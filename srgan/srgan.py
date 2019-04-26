@@ -28,6 +28,7 @@ from data_loader import DataLoader
 import numpy as np
 import os
 import argparse
+from skimage.measure import compare_ssim as ssim
 
 import keras.backend as K
 
@@ -276,8 +277,13 @@ def get_psnr(y_true, y_pred):
 
     return -10. * np.log10(np.mean(np.square(y_pred - y_true)))
 
-def get_ssim():
-    return 0
+def get_ssim(y_true, y_pred):
+    print('shape: ', y_true.shape)
+    print('len: ', len(y_true))
+    return 'hi'
+    # for 
+    # ssim_val = ssim(img, img_const, dynamic_range=img_noise.max() - img_noise.min())
+    # return ssim_val
 
 def evaluate():
     data_loader = DataLoader('', img_res=(256,256))
@@ -288,7 +294,9 @@ def evaluate():
     fakes_hr = model.predict(imgs_lr)
 
     print('psnr: ', get_psnr(imgs_hr, fakes_hr))
-    print('ssmi: ', get_ssim())
+
+    # data_loader.load_data_for_ssim(batch_size=10, is_testing=True)
+    print('ssmi: ', get_ssim(imgs_hr, fakes_hr))
 
 def get_args():
     parser = argparse.ArgumentParser()
