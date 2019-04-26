@@ -56,7 +56,7 @@ class SRGAN():
             metrics=['accuracy'])
 
         # Configure data loader
-        self.dataset_name = 'blurry_srgan'
+        self.dataset_name = 'blurry_pixel'
         self.data_loader = DataLoader(dataset_name=self.dataset_name,
                                       img_res=(self.hr_height, self.hr_width))
 
@@ -84,16 +84,13 @@ class SRGAN():
         # Generate high res. version from low res.
         fake_hr = self.generator(img_lr)
 
-        # Extract image features of the generated img
-        fake_features = self.vgg(fake_hr)
-
         # For the combined model we will only train the generator
         self.discriminator.trainable = False
 
         # Discriminator determines validity of generated high res. images
         validity = self.discriminator(fake_hr)
 
-        self.combined = Model([img_lr, img_hr], [validity, fake_features])
+        self.combined = Model([img_lr, img_hr], [validity, fake_hr])
         self.combined.compile(loss=['binary_crossentropy', 'mse'],
                               loss_weights=[1e-3, 1],
                               optimizer=optimizer)
@@ -223,22 +220,18 @@ class SRGAN():
             # The generators want the discriminators to label the generated images as real
             valid = np.ones((batch_size,) + self.disc_patch)
 
-            # Extract ground truth image features using pre-trained VGG19 model
-            image_features = self.vgg.predict(imgs_hr)
-
             # Train the generators
-            g_loss = self.combined.train_on_batch([imgs_lr, imgs_hr], [valid, image_features])
+            g_loss = self.combined.train_on_batch([imgs_lr, imgs_hr], [valid, imgs_hr])
 
             elapsed_time = datetime.datetime.now() - start_time
             # Plot the progress
             print ("%d time: %s" % (epoch, elapsed_time))
 
             # If at save interval => save generated image samples
-            # if epoch % sample_interval == 0:
-                # self.sample_images(epoch)
-                # self.generator.save('blurry_srgan.h5')
-                # self.combined.load_model('blurry_srgan.h5')
-        self.generator.save('blurry_srgan.h5')
+            if epoch % sample_interval == 0:
+                self.sample_images(epoch)
+                self.generator.save('blurry_pixel.h5')
+        # self.generator.save('blurry_srgan.h5')
 
     def sample_images(self, epoch):
         os.makedirs('images/%s' % self.dataset_name, exist_ok=True)
@@ -290,7 +283,7 @@ def evaluate():
     data_loader = DataLoader('', img_res=(256,256))
     imgs_hr, imgs_lr = data_loader.load_data(batch_size=10, is_testing=True)
     
-    filepath = './{}'.format('blurry_srgan.h5')
+    filepath = './{}'.format('blurry_pixel.h5')
     model = load_model(filepath)
     fakes_hr = model.predict(imgs_lr)
 
