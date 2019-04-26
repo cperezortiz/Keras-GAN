@@ -236,9 +236,9 @@ class SRGAN():
             # If at save interval => save generated image samples
             if epoch % sample_interval == 0:
                 self.sample_images(epoch)
-                self.generator.save('blurry_64.h5')
-                # self.combined.load_model('srgan_plain.h5')
-        # self.generator.save('blurry_64.h5')
+                self.generator.save('blurry_srgan.h5')
+                # self.combined.load_model('blurry_srgan.h5')
+        # self.generator.save('blurry_srgan.h5')
 
     def sample_images(self, epoch):
         os.makedirs('images/%s' % self.dataset_name, exist_ok=True)
