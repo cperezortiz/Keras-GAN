@@ -27,7 +27,7 @@ class DataLoader():
 
             img_hr = scipy.misc.imresize(img, self.img_res)
             img_lr = scipy.misc.imresize(img, (low_h, low_w))
-            img_lr = gaussian_filter(img_lr, sigma=(7/255,7/255,7/255))
+            img_lr = gaussian_filter(img_lr, sigma=(2,2,0))
 
             # If training => do random flip
             if not is_testing and np.random.random() < 0.5:
