@@ -56,7 +56,7 @@ class SRGAN():
             metrics=['accuracy'])
 
         # Configure data loader
-        self.dataset_name = 'blurry_64'
+        self.dataset_name = 'blurry_srgan'
         self.data_loader = DataLoader(dataset_name=self.dataset_name,
                                       img_res=(self.hr_height, self.hr_width))
 
