@@ -28,6 +28,8 @@ from data_loader import DataLoader
 import numpy as np
 import os
 import argparse
+from skimage.measure import compare_ssim as ssim
+
 
 import keras.backend as K
 
