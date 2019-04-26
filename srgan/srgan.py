@@ -34,8 +34,8 @@ class SRGAN():
     def __init__(self):
         # Input shape
         self.channels = 3
-        self.lr_height = 64                 # Low resolution height
-        self.lr_width = 64                  # Low resolution width
+        self.lr_height = 16                 # Low resolution height
+        self.lr_width = 16                  # Low resolution width
         self.lr_shape = (self.lr_height, self.lr_width, self.channels)
         self.hr_height = self.lr_height*4   # High resolution height
         self.hr_width = self.lr_width*4     # High resolution width
@@ -55,7 +55,7 @@ class SRGAN():
             metrics=['accuracy'])
 
         # Configure data loader
-        self.dataset_name = 'srgan_plain'
+        self.dataset_name = 'blurry_64'
         self.data_loader = DataLoader(dataset_name=self.dataset_name,
                                       img_res=(self.hr_height, self.hr_width))
 
@@ -235,7 +235,7 @@ class SRGAN():
             # If at save interval => save generated image samples
             if epoch % sample_interval == 0:
                 self.sample_images(epoch)
-                self.combined.save('srgan_plain.h5')
+                self.combined.save('blurry_64.h5')
                 # self.combined.load_model('srgan_plain.h5')
 
     def sample_images(self, epoch):
