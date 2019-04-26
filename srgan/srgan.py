@@ -293,8 +293,6 @@ def evaluate():
     fakes_hr = model.predict(imgs_lr)
 
     print('psnr: ', get_psnr(imgs_hr, fakes_hr))
-
-    # data_loader.load_data_for_ssim(batch_size=10, is_testing=True)
     print('ssmi: ', get_ssim(imgs_hr, fakes_hr))
 
 def get_args():
