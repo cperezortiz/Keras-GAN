@@ -234,7 +234,7 @@ class SRGAN():
             print ("%d time: %s" % (epoch, elapsed_time))
 
             # If at save interval => save generated image samples
-            if epoch % sample_interval == 0:
+            # if epoch % sample_interval == 0:
                 # self.sample_images(epoch)
                 # self.generator.save('blurry_srgan.h5')
                 # self.combined.load_model('blurry_srgan.h5')
