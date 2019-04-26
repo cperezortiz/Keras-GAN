@@ -286,7 +286,7 @@ def get_ssim():
     return 0
 
 def evaluate():
-    data_loader = DataLoader(img_res=(256,256))
+    data_loader = DataLoader('', img_res=(256,256))
     imgs_hr, imgs_lr = data_loader.load_data(batch_size=10, is_testing=True)
     
     filepath = './{}'.format('blurry_srgan.h5')
