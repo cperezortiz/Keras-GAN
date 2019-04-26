@@ -213,10 +213,10 @@ class SRGAN():
             print ("%d time: %s" % (epoch, elapsed_time))
 
             # If at save interval => save generated image samples
-            if epoch % sample_interval == 0:
-                self.sample_images(epoch)
-                self.combined.save('blurry_GD.h5')
-                # self.combined.load_model('srgan_plain.h5')
+            # if epoch % sample_interval == 0:
+            #     self.sample_images(epoch)
+            #     self.generator.save('blurry_GD.h5')
+        self.generator.save('blurry_GD.h5')
 
     def sample_images(self, epoch):
         os.makedirs('images/%s' % self.dataset_name, exist_ok=True)
@@ -250,6 +250,42 @@ class SRGAN():
             fig.savefig('images/%s/%d_lowres%d.png' % (self.dataset_name, epoch, i))
             plt.close()
 
-if __name__ == '__main__':
+def train():
     gan = SRGAN()
     gan.train(epochs=6000, batch_size=1, sample_interval=50)
+
+def get_psnr(y_true, y_pred):
+    assert y_true.shape == y_pred.shape, "Cannot calculate PSNR. Input shapes not same." \
+                                         " y_true shape = %s, y_pred shape = %s" % (str(y_true.shape),
+                                                                                   str(y_pred.shape))
+
+    return -10. * np.log10(np.mean(np.square(y_pred - y_true)))
+
+def get_ssim():
+    return 0
+
+def evaluate():
+    data_loader = DataLoader('', img_res=(256,256))
+    imgs_hr, imgs_lr = data_loader.load_data(batch_size=10, is_testing=True)
+    
+    filepath = './{}'.format('blurry_GD.h5')
+    model = load_model(filepath)
+    fakes_hr = model.predict(imgs_lr)
+
+    print('psnr: ', get_psnr(imgs_hr, fakes_hr))
+    print('ssmi: ', get_ssim())
+
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--train', action='store_true',
+                        help='Use this to train the network.')
+    parser.add_argument('--evaluate', action='store_true',
+                        help='Use this to evaluate the network.')
+    return parser.parse_args()
+
+if __name__ == '__main__':
+    FLAGS = get_args()
+    if FLAGS.train:
+        train()
+    if FLAGS.evaluate:
+        evaluate()
