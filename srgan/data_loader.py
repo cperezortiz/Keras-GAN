@@ -3,6 +3,7 @@ import scipy.misc
 from glob import glob
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.ndimage import gaussian_filter
 
 class DataLoader():
     def __init__(self, dataset_name, img_res=(128, 128)):
@@ -26,6 +27,7 @@ class DataLoader():
 
             img_hr = scipy.misc.imresize(img, self.img_res)
             img_lr = scipy.misc.imresize(img, (low_h, low_w))
+            img_lr = gaussian_filter(img_lr, sigma=(7/255,7/255,7/255))
 
             # If training => do random flip
             if not is_testing and np.random.random() < 0.5:
