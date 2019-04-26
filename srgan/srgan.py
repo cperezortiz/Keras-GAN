@@ -118,15 +118,13 @@ class SRGAN():
     def build_generator(self):
 
         def conv2d(c):
-            d = Conv2D(64, kernel_size=5, strides=1, padding='same')(c)
-            d = ReLU(alpha=0.2)(d)
+            d = Conv2D(64, kernel_size=5, strides=1, padding='same', activation='relu')(c)
             d = BatchNormalization(momentum=0.8)(d)
             return d
 
         def deconv2d(layer_input):
             """Layers used during upsampling"""
-            u = Conv2DTranspose(64, kernel_size=6, strides=2, padding='same')(layer_input)
-            u = Activation('relu')(u)
+            u = Conv2DTranspose(64, kernel_size=6, strides=2, padding='same', activation='relu')(layer_input)
             u = BatchNormalization(momentum=0.8)(u)
             return u
 
