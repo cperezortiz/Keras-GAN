@@ -283,8 +283,12 @@ def get_psnr(y_true, y_pred):
 
     return -10. * np.log10(np.mean(np.square(y_pred - y_true)))
 
-def get_ssim():
-    return 0
+def get_ssim(y_true, y_pred):
+
+    ssim_mean = 0.0
+    for i in range(len(y_true)):
+        ssim_mean += ssim(y_true[i], y_pred[i], multichannel=True, data_range=2.0)
+    return ssim_mean/len(y_true)
 
 def evaluate():
     data_loader = DataLoader('', img_res=(256,256))
@@ -295,7 +299,7 @@ def evaluate():
     fakes_hr = model.predict(imgs_lr)
 
     print('psnr: ', get_psnr(imgs_hr, fakes_hr))
-    print('ssmi: ', get_ssim())
+    print('ssim: ', get_ssim(imgs_hr, fakes_hr))
 
 def get_args():
     parser = argparse.ArgumentParser()
