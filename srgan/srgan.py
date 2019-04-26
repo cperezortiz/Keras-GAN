@@ -283,7 +283,7 @@ def get_ssim(y_true, y_pred):
 
     ssim_mean = 0.0
     for i in range(len(y_true)):
-        ssim_mean += ssim(y_true[i], y_pred[i])
+        ssim_mean += ssim(y_true[i], y_pred[i], multichannel=True)
         print(ssim_mean)
 
     return ssim_mean/len(y_true)
